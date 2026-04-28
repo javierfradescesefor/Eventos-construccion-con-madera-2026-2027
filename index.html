@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ferias y Eventos — Construcción & Descarbonización 2026–2027</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@400;500;600&display=swap');
+
+  :root {
+    --bg:        #F5F1EC;
+    --surface:   #FFFFFF;
+    --surface2:  #EDE8E1;
+    --border:    #D6CFC5;
+    --header-bg: #1C2B1E;
+    --header-border: #2E4230;
+    --accent:    #5A8C3E;      /* verde bosque Club Madera */
+    --accent2:   #8C5A2B;      /* madera cálida */
+    --accent3:   #3A6B8A;      /* azul técnico */
+    --accent4:   #C4873A;      /* ámbar madera */
+    --text:      #1C2321;
+    --text-soft: #4A5240;
+    --muted:     #7A7A6E;
+    --danger:    #C0392B;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Open Sans', sans-serif;
+    font-size: 13px;
+    min-height: 100vh;
+  }
+
+  header {
+    background: var(--header-bg);
+    border-bottom: 3px solid var(--accent);
+    padding: 22px 32px 18px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  header h1 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+    color: #FFFFFF;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+  }
+
+  header h1 span {
+    color: var(--accent);
+  }
+
+  header p {
+    color: #9DB89E;
+    font-size: 11px;
+    letter-spacing: 0.3px;
+  }
+
+  .controls {
+    padding: 14px 32px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+
+  .controls input, .controls select {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Open Sans', sans-serif;
+    font-size: 12px;
+    padding: 7px 11px;
+    border-radius: 5px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .controls input { width: 220px; }
+  .controls select { cursor: pointer; }
+
+  .controls input:focus, .controls select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(90,140,62,0.15);
+  }
+
+  .controls label {
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+  }
+
+  #count {
+    margin-left: auto;
+    color: var(--muted);
+    font-size: 11px;
+    white-space: nowrap;
+  }
+
+  #count span { color: var(--accent); font-weight: 700; }
+
+  .reset-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'Open Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 7px 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.3px;
+  }
+  .reset-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(90,140,62,0.06); }
+
+  .table-wrap {
+    padding: 20px 32px 48px;
+    overflow-x: auto;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 1100px;
+    background: var(--surface);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  }
+
+  thead th {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: #FFFFFF;
+    background: var(--header-bg);
+    padding: 11px 14px;
+    text-align: left;
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+    border-right: 1px solid var(--header-border);
+  }
+
+  thead th:last-child { border-right: none; }
+  thead th:hover { background: #253528; color: var(--accent); }
+  thead th.sorted { background: #2E4230; color: var(--accent); }
+
+  thead th .sort-indicator { margin-left: 4px; opacity: 0.5; }
+  thead th.sorted .sort-indicator { opacity: 1; }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.12s;
+  }
+
+  tbody tr:hover { background: #F0EBE3; }
+  tbody tr.hidden { display: none; }
+
+  td {
+    padding: 10px 14px;
+    vertical-align: top;
+    line-height: 1.5;
+    border-right: 1px solid #EDE8E1;
+  }
+
+  td:last-child { border-right: none; }
+
+  /* Nombre */
+  td.nombre {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text);
+    min-width: 160px;
+  }
+
+  /* Tags */
+  .tag {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 3px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin: 1px 2px 1px 0;
+    white-space: nowrap;
+  }
+
+  .tag-pais-es { background: rgba(90,140,62,0.12); color: #3A6B22; border: 1px solid rgba(90,140,62,0.3); }
+  .tag-pais-pt { background: rgba(58,107,138,0.12); color: #2A5570; border: 1px solid rgba(58,107,138,0.3); }
+  .tag-pais-eu { background: rgba(140,90,43,0.1); color: #6B3E15; border: 1px solid rgba(140,90,43,0.3); }
+
+  .tag-tipo-c { background: rgba(90,140,62,0.08); color: #3A6B22; border: 1px solid rgba(90,140,62,0.2); }
+  .tag-tipo-s { background: rgba(58,107,138,0.08); color: #2A5570; border: 1px solid rgba(58,107,138,0.2); }
+  .tag-tipo-e { background: rgba(196,135,58,0.1); color: #7A4E10; border: 1px solid rgba(196,135,58,0.3); }
+  .tag-tipo-u { background: rgba(140,90,43,0.08); color: #6B3E15; border: 1px solid rgba(140,90,43,0.2); }
+  .tag-tipo-m { background: rgba(140,90,43,0.12); color: #5C3010; border: 1px solid rgba(140,90,43,0.35); }
+
+  /* Relevancia dots */
+  .relevancia {
+    display: flex;
+    gap: 3px;
+    align-items: center;
+  }
+
+  .dot {
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    background: var(--border);
+  }
+
+  .r5 .dot { background: var(--accent); }
+  .r4 .dot:nth-child(-n+4) { background: var(--accent); }
+  .r4 .dot:nth-child(5) { background: var(--border); }
+  .r3 .dot:nth-child(-n+3) { background: var(--accent2); }
+  .r3 .dot:nth-child(n+4) { background: var(--border); }
+  .r2 .dot:nth-child(-n+2) { background: var(--accent2); }
+  .r2 .dot:nth-child(n+3) { background: var(--border); }
+
+  /* Presencia pública pill */
+  .pub-pill {
+    display: inline-block;
+    width: 9px; height: 9px;
+    border-radius: 2px;
+    margin-right: 4px;
+    vertical-align: middle;
+  }
+
+  .pub-alta  { background: var(--accent); }
+  .pub-media { background: var(--accent4); }
+  .pub-baja  { background: var(--muted); }
+
+  .num {
+    font-weight: 600;
+    color: var(--accent3);
+    font-size: 12px;
+  }
+
+  .na { color: var(--muted); }
+
+  .nota {
+    font-size: 11px;
+    color: var(--text-soft);
+    line-height: 1.5;
+    max-width: 260px;
+  }
+
+  /* Legend */
+  .legend {
+    padding: 14px 32px 24px;
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    margin: 0 32px 32px;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+
+  .legend-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .legend-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--muted);
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+  }
+
+  .no-results {
+    text-align: center;
+    padding: 48px 0;
+    color: var(--muted);
+    font-size: 13px;
+    display: none;
+    font-family: 'Montserrat', sans-serif;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Ferias &amp; Eventos — <span>Construcción con Madera</span> · Vivienda · Descarbonización Urbana</h1>
+  <p>España · Portugal · Europa &nbsp;|&nbsp; 2026–2027 &nbsp;|&nbsp; Validado con fuentes oficiales y medios especializados &nbsp;|&nbsp; Cesefor · Área Construcción con Madera e Industria</p>
+</header>
+
+<div class="controls">
+  <label>Buscar:</label>
+  <input type="text" id="search" placeholder="nombre, ciudad, temática…">
+  <label>País:</label>
+  <select id="filterPais">
+    <option value="">Todos</option>
+    <option value="ES">España</option>
+    <option value="PT">Portugal</option>
+    <option value="EU">Europa (Bruselas)</option>
+  </select>
+  <label>Año:</label>
+  <select id="filterAnio">
+    <option value="">2026 y 2027</option>
+    <option value="2026">2026</option>
+    <option value="2027">2027</option>
+  </select>
+  <label>Tipo:</label>
+  <select id="filterTipo">
+    <option value="">Todos</option>
+    <option value="Construcción">Construcción</option>
+    <option value="Sostenibilidad">Sostenibilidad/Ciudad</option>
+    <option value="Energía">Energía/Descarbonización</option>
+    <option value="Urbanismo">Urbanismo/Diseño</option>
+    <option value="Madera">Madera (cadena de valor)</option>
+  </select>
+  <button class="reset-btn" onclick="resetFilters()">↺ Reset</button>
+  <div id="count">Mostrando <span id="visible">—</span> de <span id="total">—</span> eventos</div>
+</div>
+
+<div class="table-wrap">
+  <table id="eventsTable">
+    <thead>
+      <tr>
+        <th onclick="sortTable(0)">Evento <span class="sort-indicator">↕</span></th>
+        <th onclick="sortTable(1)">Fecha <span class="sort-indicator">↕</span></th>
+        <th onclick="sortTable(2)">Ciudad <span class="sort-indicator">↕</span></th>
+        <th onclick="sortTable(3)">País <span class="sort-indicator">↕</span></th>
+        <th onclick="sortTable(4)">Tipo <span class="sort-indicator">↕</span></th>
+        <th onclick="sortTable(5)">Visitantes <span class="sort-indicator">↕</span></th>
+        <th onclick="sortTable(6)">Expositores <span class="sort-indicator">↕</span></th>
+        <th onclick="sortTable(7)">Ponentes/Mesas <span class="sort-indicator">↕</span></th>
+        <th onclick="sortTable(8)">Relevancia <span class="sort-indicator">↕</span></th>
+        <th>Notas clave</th>
+        <th>Web</th>
+        <th onclick="sortTable(11)">Presencia Pública <span class="sort-indicator">↕</span></th>
+      </tr>
+    </thead>
+    <tbody id="tbody">
+
+      <!-- REBUILD 2026 -->
+      <tr data-date="2026-03-24" data-pais="ES" data-anio="2026" data-tipo="Construcción" data-rel="5">
+<td class="nombre">REBUILD 2026</td><td>24–26 mar 2026</td><td>Madrid (IFEMA)</td><td><span class="tag tag-pais-es">ES</span></td><td><span class="tag tag-tipo-c">Construcción</span></td><td class="num">~32.500</td><td class="num">758</td><td class="num">732 ponentes · 270+ sesiones</td><td><div class="relevancia r5"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></td><td class="nota">Líder europeo en construcción industrializada y sostenible. Fuerte presencia de madera, CLT, BIM y construcción modular. Presencia directa del PERTE de la Industrialización de la Vivienda. Impacto económico >84M€ en Madrid. Referente para prescripción técnica e institucional.</td><td style="white-space:nowrap;"><a href="https://www.rebuildexpo.com" target="_blank" style="color:var(--accent3);text-decoration:none;font-size:11px;">🔗 web</a></td><td><span class="pub-pill pub-alta"></span>Alta — Min. Vivienda, Sec. Estado Vivienda y Agenda Urbana, Consejería CM</td>
+</tr>
+
+      <!-- TEKTÓNICA 2026 -->
+      <tr data-date="2026-04-23" data-pais="PT" data-anio="2026" data-tipo="Construcción" data-rel="5">
+<td class="nombre">TEKTÓNICA 2026</td><td>23–25 abr 2026</td><td>Lisboa (FIL)</td><td><span class="tag tag-pais-pt">PT</span></td><td><span class="tag tag-tipo-c">Construcción</span></td><td class="num">~33.500</td><td class="num">~400</td><td class="num">Congreso + Green Tektónica Forum</td><td><div class="relevancia r5"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></td><td class="nota">Feria líder de construcción en Portugal. Incluye TekWood (salón de madera y corcho), clave para Cesefor. Coincide con SIL (Salón Inmobiliario Lisboa). Premio a innovación. Puerta de entrada al mercado lusófono (Brasil, PALOP). 30.000m² exposición.</td><td style="white-space:nowrap;"><a href="https://www.tektonicaexpo.com" target="_blank" style="color:var(--accent3);text-decoration:none;font-size:11px;">🔗 web</a></td><td><span class="pub-pill pub-media"></span>Media — Organismos portugueses y europeos; mercado ibérico y lusófono</td>
+</tr>
+
+      <!-- CEVISAMA 2026 -->
+      <tr data-date="2026-02-23" data-pais="ES" data-anio="2026" data-tipo="Construcción" data-rel="3">
+<td class="nombre">CEVISAMA 2026</td><td>23–27 feb 2026</td><td>Valencia (Feria Valencia)</td><td><span class="tag tag-pais-es">ES</span></td><td><span class="tag tag-tipo-c">Construcción</span></td><td class="num">>70.000</td><td class="num">~403</td><td class="num">Foros, concursos de diseño, ponencias técnicas</td><td><div class="relevancia r3"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></td><td class="nota">Mayor feria cerámica y revestimientos del sur de Europa. 80.000m², 150+ países, 500+ marcas. Foco en materiales sostenibles, eficiencia y nuevas superficies. Menos relevante para madera estructural, pero importante para materiales de envolvente. Evento industrial más importante de la C. Valenciana.</td><td style="white-space:nowrap;"><a href="https://www.cevisama.feriavalencia.com" target="_blank" style="color:var(--accent3);text-decoration:none;font-size:11px;">🔗 web</a></td><td><span class="pub-pill pub-media"></span>Media — Conselleria Economía Sostenible de la GV, Instituto Tecnológico de la Cerámica</td>
+</tr>
+
+      <!-- SMOPYC 2026 -->
+      <tr data-date="2026-04-15" data-pais="ES" data-anio="2026" data-tipo="Construcción" data-rel="2">
+<td class="nombre">SMOPYC 2026</td><td>15–18 abr 2026</td><td>Zaragoza (Feria Zaragoza)</td><td><span class="tag tag-pais-es">ES</span></td><td><span class="tag tag-tipo-c">Construcción</span></td><td class="num">~30.000</td><td class="num">~500</td><td class="num">Jornadas técnicas, foros sectoriales</td><td><div class="relevancia r2"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></td><td class="nota">Mayor feria de maquinaria para construcción y obra pública del sur de Europa. Menos relevante para biomateriales, aunque toca rehabilitación e industria de la construcción.</td><td style="white-space:nowrap;"><a href="https://www.smopyc.com" target="_blank" style="color:var(--accent3);text-decoration:none;font-size:11px;">🔗 web</a></td><td><span class="pub-pill pub-media"></span>Media — 15 asociaciones del sector, administración aragonesa</td>
+</tr>
+
+      <!-- FESTIVAL NEB 2026 -->
+      <tr data-date="2026-06-09" data-pais="EU" data-anio="2026" data-tipo="Sostenibilidad" data-rel="5">
+<td class="nombre">Festival NEB 2026 (New European Bauhaus)</td><td>9–13 jun 2026</td><td>Bruselas (+ satélites EU)</td><td><span class="tag tag-pais-eu">EU</span></td><td><span class="tag tag-tipo-s">Sostenibilidad</span></td><td class="num">Miles (EU-wide)</td><td class="num">Proyectos seleccionados</td><td class="num">Forum + Fair + Fest; múltiples mesas</td><td><div class="relevancia r5"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></td><td class="nota">Evento bienal de la CE sobre entorno construido sostenible, inclusivo y bello. Foco 2026: vivienda asequible y participación democrática. Altísimo alcance político (CE + Estados Miembro). Cesefor ya trabaja con NEB; presencia en satélites y Fair es estratégica para proyectos Horizon/LIFE. Eventos satélite en toda Europa.</td><td style="white-space:nowrap;"><a href="https://new-european-bauhaus.europa.eu/events" target="_blank" style="color:var(--accent3);text-decoration:none;font-size:11px;">🔗 web</a></td><td><span class="pub-pill pub-alta"></span>Máxima — Organizado por Comisión Europea; instituciones, ciudades, ministerios de toda la UE</td>
+</tr>
+
+      <!-- GREENCITIES 2026 -->
+      <tr data-date="2026-09-15" data-pais="ES" data-anio="2026" data-tipo="Sostenibilidad" data-rel="5">
+<td class="nombre">GREENCITIES 2026</td><td>15–16 sep 2026</td><td>Málaga (FYCMA)</td><td><span class="tag tag-pais-es">ES</span></td><td><span class="tag tag-tipo-s">Sostenibilidad</span></td><td class="num">~2.200</td><td class="num">~88</td><td class="num">150 ponentes · 40 paneles · Foro de Alcaldes</td><td><div class="relevancia r5"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></td><td class="nota">El evento español con mayor concentración de representantes municipales electos. 200+ entidades y 27 países. Temáticas 2026: economía circular, transición climática, naturaleza urbana, agua, movilidad, datos. Formato público-privado ideal para presentar soluciones a administraciones. Organizado por el propio Ayuntamiento de Málaga. Coorganizador: AMETIC, con apoyo del MITECO.</td><td style="white-space:nowrap;"><a href="https://www.greencities.es" target="_blank" style="color:var(--accent3);text-decoration:none;font-size:11px;">🔗 web</a></td><td><span class="pub-pill pub-alta"></span>Máxima — 45+ alcaldes y alcaldesas, 100+ ciudades/municipios, FEMP, RECI, Innpulso, Junta de Andalucía, Diputación Málaga, Univ. Málaga</td>
+</tr>
+
+      <!-- CONSTRUTEC 2026 -->
+      <tr data-date="2026-11-10" data-pais="ES" data-anio="2026" data-tipo="Construcción" data-rel="4">
+<td class="nombre">Semana Intl. Construcción 2026 (CONSTRUTEC+VETECO+SMARTDOORS+PISCIMAD)</td><td>10–13 nov 2026</td><td>Madrid (IFEMA)</td><td><span class="tag tag-pais-es">ES</span></td><td><span class="tag tag-tipo-c">Construcción</span></td><td class="num">~46.700 (ed. 2024)</td><td class="num">420+ inscritas (prev. ~560)</td><td class="num">100+ ponentes · 80+ jornadas · II Congreso SIC</td><td><div class="relevancia r4"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></td><td class="nota">Mayor feria de materiales y soluciones constructivas en España. 42.000m². 16% visitantes internacionales (80+ países). 5 ejes estratégicos: industrialización, sostenibilidad, digitalización, liderazgo y talento. Incluye BIMEXPO. Respaldo ministerial directo.</td><td style="white-space:nowrap;"><a href="https://www.ifema.es/construtec" target="_blank" style="color:var(--accent3);text-decoration:none;font-size:11px;">🔗 web</a></td><td><span class="pub-pill pub-alta"></span>Alta — Min. Vivienda y Agenda Urbana, Comunidad de Madrid, CEPCO (confederación fabricantes), asociaciones sectoriales</td>
+</tr>
+
+      <!-- GENERA + MATELEC 2026 -->
+      <tr data-date="2026-11-24" data-pais="ES" data-anio="2026" data-tipo="Energía" data-rel="4">
+<td class="nombre">GENERA + MATELEC 2026 (Semana Intl. Electrificación y Descarbonización)</td><td>24–26 nov 2026</td><td>Madrid (IFEMA)</td><td><span class="tag tag-pais-es">ES</span></td><td><span class="tag tag-tipo-e">Energía</span></td><td class="num">57.000 (GENERA+MATELEC) / 102.000 con C&R</td><td class="num">800+</td><td class="num">Programa extenso; foros técnicos por segmento</td><td><div class="relevancia r4"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></td><td class="nota">El mayor evento español de energía y descarbonización. Foco: renovables, almacenamiento, electrificación edificios, rehabilitación energética, redes inteligentes. Visitantes de 76 países. Respaldo del IDAE y MITECO. Relevante para la intersección madera-eficiencia energética y rehabilitación.</td><td style="white-space:nowrap;"><a href="https://www.ifema.es/genera" target="_blank" style="color:var(--accent3);text-decoration:none;font-size:11px;">🔗 web</a></td><td><span class="pub-pill pub-alta"></span>Máxima — MITECO, IDAE (Instituto Diversificación Ahorro Energía), Sec. Estado de Energía</td>
+</tr>
+
+      <!-- SMART CITY EXPO 2026 -->
+      <tr data-date="2026-11-03" data-pais="ES" data-anio="2026" data-tipo="Urbanismo" data-rel="5">
+<td class="nombre">SMART CITY EXPO WORLD CONGRESS 2026</td><td>3–5 nov 2026</td><td>Barcelona (Fira Gran Via)</td><td><span class="tag tag-pais-es">ES</span></td><td><span class="tag tag-tipo-u">Urbanismo</span></td><td class="num">25.000–27.000</td><td class="num">1.100–1.200</td><td class="num">600+ ponentes · 9 escenarios temáticos</td><td><div class="relevancia r5"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></td><td class="nota">Mayor evento mundial de innovación urbana. 55% de asistentes son decisores. Temáticas: energía y medio ambiente, infraestructura y edificación, gobernanza, movilidad, tecnologías. Muy fuerte en alcance político internacional. Pabellón España organizado por entidades públicas (Red.es, ICEX). Clave para posicionamiento en redes internacionales de ciudades.</td><td style="white-space:nowrap;"><a href="https://www.smartcityexpo.com" target="_blank" style="color:var(--accent3);text-decoration:none;font-size:11px;">🔗 web</a></td><td><span class="pub-pill pub-alta"></span>Máxima — 850+ ciudades y gobiernos, 135 países, Red.es + ICEX + FEMP + RECI (Pabellón España)</td>
+</tr>
+
+      <!-- Feria Intl. Construcción OPORTO 2026 -->
+      <tr data-date="2026-11-25" data-pais="PT" data-anio="2026" data-tipo="Construcción" data-rel="2">
+<td class="nombre">Feria Intl. Construcción Oporto 2026</td><td>25–26 nov 2026</td><td>Oporto (Exponor)</td><td><span class="tag tag-pais-pt">PT</span></td><td><span class="tag tag-tipo-c">Construcción</span></td><td class="num">N/D</td><td class="num">N/D</td><td class="num">N/D</td><td><div class="relevancia r2"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></td><td class="nota">Feria internacional de materiales para la construcción en Exponor (Matosinhos, Oporto). Menor escala que Tektónica. Útil para contacto con empresas del norte de Portugal.</td><td style="white-space:nowrap;"><a href="https://www.exponor.pt" target="_blank" style="color:var(--accent3);text-decoration:none;font-size:11px;">🔗 web</a></td><td><span class="pub-pill pub-baja"></span>Baja-Media — Sector privado, mercado norte de Portugal</td>
+</tr>
+
+      <!-- CONSTRUMAT 2027 -->
+      <tr data-date="2027-05-18" data-pais="ES" data-anio="2027" data-tipo="Construcción" data-rel="5">
+<td class="nombre">CONSTRUMAT 2027</td><td>18–20 may 2027</td><td>Barcelona (Fira Gran Via, pab. 6 y 7)</td><td><span class="tag tag-pais-es">ES</span></td><td><span class="tag tag-tipo-c">Construcción</span></td><td class="num">>22.300 (ed. 2025; previsto crecer)</td><td class="num">>400 (350 en ed. 2025)</td><td class="num">164 actividades ed. 2025 · 212 ponentes · Sustainable Building Congress</td><td><div class="relevancia r5"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></td><td class="nota">Referente bienal del sector en España y arco mediterráneo. Lema 2027: 'Construyendo sostenibilidad'. +23% superficie (13.500m²). Bienal: edición 2027 será la 25ª. Foco madera y materiales ecosost. con World Wood Future. Programa Comprador Internacional (Francia, Italia, Portugal, Marruecos). Visitantes internacionales 13% (Portugal, Italia, Francia).</td><td style="white-space:nowrap;"><a href="https://www.construmat.com" target="_blank" style="color:var(--accent3);text-decoration:none;font-size:11px;">🔗 web</a></td><td><span class="pub-pill pub-alta"></span>Alta — 140+ asociaciones (CSCAE, CGATE, COAC, APCEspaña); Fundación Mies van der Rohe (Premios); Junta y Colegios Profesionales</td>
+</tr>
+
+      <!-- CONCRETA 2027 Portugal -->
+      <tr data-date="2027-11-01" data-pais="PT" data-anio="2027" data-tipo="Construcción" data-rel="3">
+<td class="nombre">CONCRETA 2027</td><td>Nov 2027 (por confirmar)</td><td>Oporto (Exponor)</td><td><span class="tag tag-pais-pt">PT</span></td><td><span class="tag tag-tipo-c">Construcción</span></td><td class="num">N/D (bienal, alterna con Tektónica)</td><td class="num">N/D</td><td class="num">N/D</td><td><div class="relevancia r3"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></td><td class="nota">Mayor exposición de construcción, arquitectura, diseño e ingeniería de Portugal. Bienal, alterna con Tektónica. Se celebra en Oporto/Exponor. Fechas exactas pendientes de confirmar. Evento de referencia en el norte de Portugal y mercado ibérico.</td><td style="white-space:nowrap;"><a href="https://www.exponor.pt/concreta" target="_blank" style="color:var(--accent3);text-decoration:none;font-size:11px;">🔗 web</a></td><td><span class="pub-pill pub-media"></span>Media — Organismos del sector en Portugal; Exponor</td>
+</tr>
+
+      <!-- FESCOMAD 2026 -->
+      <tr data-date="2026-03-25" data-pais="ES" data-anio="2026" data-tipo="Construcción" data-rel="2">
+<td class="nombre">FESCOMAD 2026</td><td>25–26 mar 2026</td><td>Madrid</td><td><span class="tag tag-pais-es">ES</span></td><td><span class="tag tag-tipo-c">Construcción</span></td><td class="num">N/D</td><td class="num">N/D</td><td class="num">Jornadas técnicas y formativas</td><td><div class="relevancia r2"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></td><td class="nota">Feria de la construcción orientada a empleo, formación y relevo generacional. Organizada por la Fundación Laboral de la Construcción de Madrid. Menos orientada a prescripción técnica; útil para vinculación con el tejido profesional y PYME de Madrid.</td><td style="white-space:nowrap;"><a href="https://fundacionlaboral.org" target="_blank" style="color:var(--accent3);text-decoration:none;font-size:11px;">🔗 web</a></td><td><span class="pub-pill pub-media"></span>Media — Fundación Laboral de la Construcción, UPM, CCOO Madrid</td>
+</tr>
+
+      <!-- 360 by Cevisama -->
+      <tr data-date="2026-09-28" data-pais="ES" data-anio="2026" data-tipo="Construcción" data-rel="2">
+<td class="nombre">360° by Cevisama + Hábitat Valencia</td><td>28 sep – 1 oct 2026</td><td>Valencia (Feria Valencia)</td><td><span class="tag tag-pais-es">ES</span></td><td><span class="tag tag-tipo-c">Construcción</span></td><td class="num">N/D</td><td class="num">N/D</td><td class="num">N/D</td><td><div class="relevancia r2"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></td><td class="nota">Evento complementario de Cevisama. Conecta diseño, calidad e innovación en materiales. Se celebra con Feria Hábitat Valencia, Espacio Cocina SICI y Textilhogar. Más orientado a prescriptores (arquitectos/interioristas) que a la cadena técnica de construcción con madera.</td><td style="white-space:nowrap;"><a href="https://www.cevisama.feriavalencia.com" target="_blank" style="color:var(--accent3);text-decoration:none;font-size:11px;">🔗 web</a></td><td><span class="pub-pill pub-baja"></span>Baja — Sector privado; distribuidores e interioristas</td>
+</tr>
+
+      <!-- EGURTEK 2026 -->
+      <tr data-date="2026-10-28" data-pais="ES" data-anio="2026" data-tipo="Construcción" data-rel="5">
+<td class="nombre">EGURTEK 2026 (XI Foro Intl. Arquitectura y Construcción en Madera)</td><td>28–29 oct 2026 (prev.)</td><td>Bilbao (BEC, Barakaldo)</td><td><span class="tag tag-pais-es">ES</span></td><td><span class="tag tag-tipo-c">Construcción</span></td><td class="num">N/D (ed. 2024: 63 expositores)</td><td class="num">~63 (8 países: ES, DE, AU, BE, US, FR, IT…)</td><td class="num">Congreso internacional · Jornadas técnicas · Innovation Workshops · Premios Egurtek (6 categorías)</td><td><div class="relevancia r5"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></td><td class="nota">El único evento del Estado español dedicado exclusivamente a la arquitectura y construcción con madera. Bienal desde 2004 (11ª ed. 2026). Congreso de alto nivel con arquitectos de fama mundial (pasadas ediciones: ponentes Pritzker). Premios Egurtek = el "Oscar" español del sector. Premio especial Basque Quality a madera local. Demos en directo. Fuerte apoyo institucional del Gobierno Vasco. Muy relevante para Cesefor: ecosistema vasco-navarro de madera (Egoin, Holtza, Baskegur). Misma área geográfica que el Forum de Pamplona.</td><td style="white-space:nowrap;"><a href="https://egurtek.bilbaoexhibitioncentre.com" target="_blank" style="color:var(--accent3);text-decoration:none;font-size:11px;">🔗 web</a></td><td><span class="pub-pill pub-alta"></span>Alta — BEC organiza; Partner institucional: Gobierno Vasco (Dpto. Alimentación, Desarrollo Rural, Agricultura y Pesca); colaboran Baskegur, COAVN, UPV/EHU</td>
+</tr>
+
+      <!-- FORUM INTERNACIONAL CONSTRUCCIÓN CON MADERA PAMPLONA 2026 -->
+      <tr data-date="2026-06-03" data-pais="ES" data-anio="2026" data-tipo="Construcción" data-rel="5">
+<td class="nombre">Forum Internacional Construcción con Madera — Pamplona (6ª ed.)</td><td>3–4 jun 2026</td><td>Pamplona (Baluarte + visita fábrica Madergia, Aoiz)</td><td><span class="tag tag-pais-es">ES</span></td><td><span class="tag tag-tipo-c">Construcción</span></td><td class="num">~400 profesionales (arquitectos, ingenieros, promotoras)</td><td class="num">Zona expo empresas (ADEMAN, Madergia, etc.) + stands asociaciones</td><td class="num">5 bloques · ponentes nacionales e internacionales · visita técnica CLT · cena gala networking</td><td><div class="relevancia r5"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></td><td class="nota">Parte de Forum Holzbau, la mayor red mundial de congresos de construcción con madera: 13 eventos anuales en Europa. Único congreso anual en España exclusivamente dedicado a madera técnica en edificación. Foco 2026: madera estructural en vivienda residencial, social e industrial; IA aplicada a diseño estructural; escasez de vivienda como palanca. Carácter eminentemente técnico y práctico. Zona expo de empresas paralela al congreso. Misma red que los foros de Austria, Alemania, Suiza, Francia, etc. Muy relevante para Cesefor: red de contactos europeos, ponentes de referencia, prescriptores técnicos.</td><td style="white-space:nowrap;"><a href="https://www.forum-maderaconstruccion.com" target="_blank" style="color:var(--accent3);text-decoration:none;font-size:11px;">🔗 web</a></td><td><span class="pub-pill pub-alta"></span>Alta — Maite Verdú (DG Agenda Urbana y Arquitectura, Min. Vivienda); Univ. de Navarra; ADEMAN; IAAC; coincide con entrada en vigor CTE 2026</td>
+</tr>
+
+      <!-- EXPOCONSTRUYE 2026 -->
+      <tr data-date="2026-10-14" data-pais="ES" data-anio="2026" data-tipo="Construcción" data-rel="2">
+<td class="nombre">EXPOCONSTRUYE 2026 (VI Feria Construcción Cádiz)</td><td>14–15 oct 2026</td><td>Jerez de la Frontera (IFECA, Cádiz)</td><td><span class="tag tag-pais-es">ES</span></td><td><span class="tag tag-tipo-c">Construcción</span></td><td class="num">>5.000</td><td class="num">N/D (triplicado en ed. 2024 vs 2023)</td><td class="num">~50 actividades: ponencias, mesas redondas Innovation Corner, Snap Experience, Networking Space</td><td><div class="relevancia r2"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></td><td class="nota">Principal feria de construcción en Andalucía occidental. VI edición. Organizada por FAEC (Federación de Empresarios de la Construcción de Cádiz). 4.000m² cubiertos. Premios Expoconstruye (sostenibilidad, digitalización, generación de empleo). Financiación pública de los espacios técnicos por Diputación. Formato orientado al tejido PYME andaluz de construcción; interesante como antena para el sur de España, aunque con alcance más regional que nacional.</td><td style="white-space:nowrap;"><a href="https://expoconstruye.es" target="_blank" style="color:var(--accent3);text-decoration:none;font-size:11px;">🔗 web</a></td><td><span class="pub-pill pub-media"></span>Media — FAEC, Ayto. Jerez, Diputación de Cádiz (financia Dipuinnova+), Delegación Provincial de la Junta; colegios técnicos de Cádiz (Aparejadores, Arquitectos, Ingenieros)</td>
+</tr>
+
+      <!-- EUROBOIS 2026 -->
+      <tr data-date="2026-02-03" data-pais="EU" data-anio="2026" data-tipo="Construcción" data-rel="4">
+<td class="nombre">EUROBOIS 2026</td><td>3–6 feb 2026</td><td>Lyon (Eurexpo)</td><td><span class="tag tag-pais-eu">EU</span></td><td><span class="tag tag-tipo-c">Construcción</span></td><td class="num">~30.000 (ed. 2024: 29.363)</td><td class="num">523 (ed. 2024)</td><td class="num">Conferencias, demos en vivo, Campus Eurobois, concurso WorldSkills, B2B spaces</td><td><div class="relevancia r4"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></td><td class="nota">Feria líder de la madera en Francia, bienal desde 1971. Cubre toda la cadena: maquinaria, herramientas, materias primas, construcción con madera, energía de biomasa, mueble y diseño. 4 ejes 2026: futuro sostenible, innovación, formación y cumplimiento normativo (RE2020). Muy próxima geográficamente al mercado español. Alta participación de arquitectos y prescriptores. Próxima edición (2028) con enlace a BePOSITIVE.</td><td style="white-space:nowrap;"><a href="https://www.eurobois.net" target="_blank" style="color:var(--accent3);text-decoration:none;font-size:11px;">🔗 web</a></td><td><span class="pub-pill pub-media"></span>Media — GL Events, organismos franceses del sector forestal, instituciones formativas; presencia de collectivités</td>
+</tr>
+
+      <!-- PARIS BUILDERS SHOW / BATIMAT 2026 -->
+      <tr data-date="2026-09-28" data-pais="EU" data-anio="2026" data-tipo="Construcción" data-rel="3">
+<td class="nombre">PARIS BUILDERS SHOW 2026 (Batimat + Interclima + Idéobain + Renodays)</td><td>28 sep – 1 oct 2026</td><td>París (Porte de Versailles)</td><td><span class="tag tag-pais-eu">EU</span></td><td><span class="tag tag-tipo-c">Construcción</span></td><td class="num">~320.000 (42% internacionales, 100+ países)</td><td class="num">1.700–2.000 (30+ países)</td><td class="num">20+ workshops, conferencias descarbonización, Innovation Awards, Renodays foro renovación</td><td><div class="relevancia r3"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></td><td class="nota">Mayor feria de construcción del mundo. Bienal. En 2026 cambia de nombre a Paris Builders Show. Nuevo Forum Renodays dedicado a rehabilitación y renovación energética. Espacio de 600m² específico de Construcción Baja en Carbono con materiales de origen biológico (madera, cáñamo, paja, tierra). Foco normativo RE2020 y descarbonización. Muy relevante para posicionamiento europeo de Cesefor y contactos con cadena de valor francesa. Promosalons tiene delegación en Portugal para captación de visitantes ibéricos.</td><td style="white-space:nowrap;"><a href="https://www.batimat.com" target="_blank" style="color:var(--accent3);text-decoration:none;font-size:11px;">🔗 web</a></td><td><span class="pub-pill pub-media"></span>Media-Alta — RX France, organismos franceses de la construcción; presencia de políticas EU; delegaciones de Portugal, Alemania, Italia, Bélgica</td>
+</tr>
+
+      <!-- LIGNA 2027 -->
+      <tr data-date="2027-05-10" data-pais="EU" data-anio="2027" data-tipo="Construcción" data-rel="5">
+<td class="nombre">LIGNA 2027</td><td>10–14 may 2027</td><td>Hannover (Deutsche Messe)</td><td><span class="tag tag-pais-eu">EU</span></td><td><span class="tag tag-tipo-c">Construcción</span></td><td class="num">~85.000 (ed. 2025; 58% internacionales)</td><td class="num">>1.300 (50+ países)</td><td class="num">LIGNA.Stage forum; workshops; 3 áreas foco: Sustainable Production, Engineered Wood, Connectivity</td><td><div class="relevancia r5"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></td><td class="nota">Feria líder mundial de la industria forestal y de la madera, bienal desde 1975. 105.000m². 60% visitantes con cargos de alta dirección. 97% acuden con planes de inversión concretos. 3 áreas clave 2027: LIGNA.ENGINEERED WOOD (CLT, madera laminada, construcción industrializada), LIGNA.SUSTAINABLE PRODUCTION y LIGNA.CONNECTIVITY. España es uno de los top 5 países de origen de expositores. España y Portugal tienen fuerte representación. Imprescindible para Cesefor en 2027: toda la cadena forestal-industria-construcción en un solo recinto. Demostración en vivo de procesos prefabricados y construcción con madera estructural.</td><td style="white-space:nowrap;"><a href="https://www.ligna.de" target="_blank" style="color:var(--accent3);text-decoration:none;font-size:11px;">🔗 web</a></td><td><span class="pub-pill pub-media"></span>Media — Deutsche Messe AG + VDMA Woodworking Machinery; EUMABOIS (federación europea fabricantes maquinaria madera); instituciones académicas y tecnológicas</td>
+</tr>
+
+      <!-- SIMA 2026 -->
+      <tr data-date="2026-05-20" data-pais="ES" data-anio="2026" data-tipo="Construcción" data-rel="3">
+<td class="nombre">SIMA 2026 (Salón Inmobiliario de Madrid)</td><td>20–23 may 2026</td><td>Madrid (IFEMA)</td><td><span class="tag tag-pais-es">ES</span></td><td><span class="tag tag-tipo-c">Construcción</span></td><td class="num">>21.000</td><td class="num">>200 ponentes · 5.000+ empresas representadas</td><td class="num">200+ ponentes · International Living Conference</td><td><div class="relevancia r3"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></td><td class="nota">Mayor feria inmobiliaria de España, 27ª edición. Incluye SIMA EXPO, SIMAPRO, SIMA INVEST y PROPTECH EXPO. 35 países representados. Foco en industrialización, sostenibilidad, rehabilitación urbana y nuevos modelos constructivos. País invitado 2026: República Dominicana. Premios ASPRIMA-SIMA a proyectos con criterios de calidad y sostenibilidad. Puerta de entrada para proponer construcción con madera a promotores.</td><td style="white-space:nowrap;"><a href="https://www.sima-inmobiliaria.es" target="_blank" style="color:var(--accent3);text-decoration:none;font-size:11px;">🔗 web</a></td><td><span class="pub-pill pub-alta"></span>Alta — ASPRIMA, IFEMA, sector promotor; SIMAPRO con participación de sector público y privado; Comunidad de Madrid registra el evento</td>
+</tr>
+
+      <!-- FIMMA + MADERALIA 2026 -->
+      <tr data-date="2026-11-10" data-pais="ES" data-anio="2026" data-tipo="Construcción" data-rel="5">
+<td class="nombre">FIMMA + MADERALIA 2026 (+ Salón Construcción Industrializada)</td><td>10–13 nov 2026</td><td>Valencia (Feria Valencia)</td><td><span class="tag tag-pais-es">ES</span></td><td><span class="tag tag-tipo-c">Construcción</span></td><td class="num">35.190 (ed. 2024; bienal)</td><td class="num">600+ (ed. 2024; 35% extranjeros)</td><td class="num">Jornadas técnicas, demos en vivo, construcción de estructura en directo</td><td><div class="relevancia r5"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></td><td class="nota">La feria de referencia europea para la industria de la madera en el 2º semestre del año. 72.000m² (ed. 2024, +38%). 63 países. Estreno en 2026 del 'Salón de la Construcción Industrializada', con construcción en vivo de estructura de madera de 3 plantas y participación de promotoras, constructoras y administraciones. Feria Valencia coorganizó con Cesefor el Speed Networking del Club Madera 2025. Imprescindible para Cesefor: cadena de valor completa (aserradero→producto→prescriptor). Bienal.</td><td style="white-space:nowrap;"><a href="https://fimma-maderalia.feriavalencia.com" target="_blank" style="color:var(--accent3);text-decoration:none;font-size:11px;">🔗 web</a></td><td><span class="pub-pill pub-media"></span>Media — Feria Valencia, comités organizadores; administraciones invitadas al nuevo Salón de Construcción Industrializada</td>
+</tr>
+
+      <!-- SIMED 2026 -->
+      <tr data-date="2026-11-12" data-pais="ES" data-anio="2026" data-tipo="Construcción" data-rel="3">
+<td class="nombre">SIMED 2026 (Salón Inmobiliario del Mediterráneo)</td><td>12–14 nov 2026</td><td>Málaga (FYCMA)</td><td><span class="tag tag-pais-es">ES</span></td><td><span class="tag tag-tipo-c">Construcción</span></td><td class="num">7.500 (ed. 2025; 70% perfil profesional)</td><td class="num">190+ expositores · 600 entidades</td><td class="num">Foro Colaboración Público-Privada · Prime Homes Summit · paneles temáticos</td><td><div class="relevancia r3"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></td><td class="nota">22ª edición. Reconocida como feria internacional en 2026 (BOE). 11.000m². 9.400 viviendas nacionales + 4.100 internacionales + suelo para ~29.000 unidades. Foco: segunda residencia, inversión, colaboración público-privada, innovación tecnológica aplicada al sector. Espacio dedicado a PropTech/ConTech. Organizado por FYCMA (Ayto. Málaga), misma sede que Greencities. Útil para acceso a promotores del sur de España e inversores internacionales.</td><td style="white-space:nowrap;"><a href="https://www.simedmalaga.com" target="_blank" style="color:var(--accent3);text-decoration:none;font-size:11px;">🔗 web</a></td><td><span class="pub-pill pub-alta"></span>Alta — Organizado por FYCMA (Ayto. Málaga); reconocida como feria internacional (BOE) por Secretaría de Estado de Comercio; participación habitual de administraciones, Junta de Andalucía, promotoras públicas</td>
+</tr>
+
+      <!-- GALIFOREST 2026 -->
+      <tr data-date="2026-07-02" data-pais="ES" data-anio="2026" data-tipo="Madera" data-rel="5">
+<td class="nombre">GALIFOREST ABANCA 2026 (VIII ed.)</td><td>2–4 jul 2026</td><td>Boqueixón, A Coruña (Monte Sergude)</td><td><span class="tag tag-pais-es">ES</span></td><td><span class="tag tag-tipo-m">Madera</span></td><td class="num">9.612 (ed. 2024; +34% vs anterior; récord)</td><td class="num">360 firmas / 107 expositores directos; 28 países</td><td class="num">Jornadas técnicas · Concurso Innovación Tecnológica · ~200 demostraciones en vivo</td><td><div class="relevancia r5"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></td><td class="nota">Mayor feria forestal de España y referente del sur de Europa. Cubre toda la cadena monte-industria: maquinaria forestal, aprovechamientos, aserraderos, biomasa, certificación, gestión forestal. Se celebra en un monte real (45 ha), con demostraciones en condiciones reales de trabajo. Presencia habitual de Portugal, Francia, Italia, Brasil, Letonia. Crece edición tras edición desde 2016. Muy relevante para Cesefor: conexión forestal-industria, contacto con empresas de toda la cadena y administraciones forestales de Galicia y CyL.</td><td style="white-space:nowrap;"><a href="https://www.galiforest.com" target="_blank" style="color:var(--accent3);text-decoration:none;font-size:11px;">🔗 web</a></td><td><span class="pub-pill pub-alta"></span>Alta — Feria Intl. de Galicia ABANCA (organizadora); Xunta de Galicia; XERA (Axencia Galega Industria Forestal); Consellería do Medio Rural; FEARMAGA; Clúster Biomasa Galicia; PEFC Galicia; EE.FF. Univ. Vigo</td>
+</tr>
+
+      <!-- ASTURFORESTA 2026 -->
+      <tr data-date="2026-06-19" data-pais="ES" data-anio="2026" data-tipo="Madera" data-rel="4">
+<td class="nombre">ASTURFORESTA 2026</td><td>Jun 2026 (prev. 3ª semana)</td><td>Tineo, Asturias (Monte Armayán)</td><td><span class="tag tag-pais-es">ES</span></td><td><span class="tag tag-tipo-m">Madera</span></td><td class="num">9.100+ (ed. 2025)</td><td class="num">110+ expositores europeos; 45 ha exposición</td><td class="num">Jornadas técnicas · Demostraciones maquinaria in situ · Premio Carbayo de Oro</td><td><div class="relevancia r4"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></td><td class="nota">Única feria forestal internacional reconocida oficialmente en la Península Ibérica. Anual desde 1997. Miembro de Forestry Demo Fairs (red con KWF, Elmia Wood, FinnMETKO, Euroforest). Celebración en monte real con demostraciones de maquinaria en trabajo efectivo. Foco: silvicultura, aprovechamientos, biomasa, maquinaria, gestión forestal. Fuerte apoyo ministerial (MITECO) y autonómico. Conexión directa con la parte forestal y de aserradero de la cadena de valor, el primer eslabón antes de Maderaula.</td><td style="white-space:nowrap;"><a href="https://www.asturforesta.es" target="_blank" style="color:var(--accent3);text-decoration:none;font-size:11px;">🔗 web</a></td><td><span class="pub-pill pub-alta"></span>Alta — Ayto. Tineo (organizador); MITECO; Gobierno del Principado de Asturias; Caja Rural Asturias; Forestry Demo Fairs (red internacional ferias forestales)</td>
+</tr>
+
+      <!-- IBER-FORESTA 2026 -->
+      <tr data-date="2026-06-26" data-pais="ES" data-anio="2026" data-tipo="Madera" data-rel="3">
+<td class="nombre">IBER-FORESTA 2026 (3ª Feria Forestal Ibérica)</td><td>26–29 jun 2026</td><td>Plasencia, Cáceres (Recinto El Berrocal)</td><td><span class="tag tag-pais-es">ES</span></td><td><span class="tag tag-tipo-m">Madera</span></td><td class="num">15.000–20.000 (objetivo; ed. anteriores ~50 expositores)</td><td class="num">50+ expositores nacionales e internacionales</td><td class="num">Jornadas técnicas · Demostraciones · Ponencias · Misión Comercial Inversa Extremadura Avante</td><td><div class="relevancia r3"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></td><td class="nota">Feria forestal ibérica del ecosistema mediterráneo (encinar, alcornoque, dehesa, pino mediterráneo). Cubre sector forestal, biomasa, recursos hídricos, maquinaria, jardinería y vehículos ecológicos. Coincide con Misión Comercial Inversa MEDIOAMBIENTE Y FORESTAL de Extremadura Avante (internacionalización). Carácter ibérico con participación habitual de Portugal. Relevante para Cesefor por el trabajo con administraciones públicas de CyL y Extremadura y la cadena forestal de especies mediterráneas.</td><td style="white-space:nowrap;"><a href="https://iber-foresta.com" target="_blank" style="color:var(--accent3);text-decoration:none;font-size:11px;">🔗 web</a></td><td><span class="pub-pill pub-alta"></span>Alta — Extrefor (promotora); FEVAL (Institución Ferial Extremadura, organizadora); Junta de Extremadura; Diputación de Cáceres; Ayto. Plasencia; Univ. Extremadura; SECF</td>
+</tr>
+
+      <!-- EXPOBIOMASA 2027 -->
+      <tr data-date="2027-10-01" data-pais="ES" data-anio="2027" data-tipo="Madera" data-rel="5">
+<td class="nombre">EXPOBIOMASA 2027 (XVII ed.)</td><td>Otoño 2027 (bienal; fecha por confirmar)</td><td>Valladolid (Feria de Valladolid)</td><td><span class="tag tag-pais-es">ES</span></td><td><span class="tag tag-tipo-m">Madera</span></td><td class="num">6.400+ (ed. 2025; 35 países)</td><td class="num">350+ expositores / marcas; 24 países</td><td class="num">90+ ponentes · Congreso Intl. Bioenergía · mesas pellet, biomasa industrial, redes calor, biochar, biorrefinados</td><td><div class="relevancia r5"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></td><td class="nota">Principal feria de biomasa y bioenergía de España, Portugal y América Latina. Bienal (2025/2027). Cubre maquinaria forestal, biocombustibles sólidos, pellet, calderas, redes de calor, biochar y biorrefinados. Ed. 2025: incorpora bioeconomía y valorización avanzada. Congreso Internacional de Bioenergía paralelo. Valladolid sede histórica (casi 20 años), ciudad en la Misión Climática Europea (100 ciudades CE). Cesefor tiene presencia institucional en Valladolid y CyL; esta feria conecta el eslabón biomasa/bioenergía de la cadena forestal con el trabajo de Maderaula.</td><td style="white-space:nowrap;"><a href="https://expobiomasa.com" target="_blank" style="color:var(--accent3);text-decoration:none;font-size:11px;">🔗 web</a></td><td><span class="pub-pill pub-alta"></span>Alta — AVEBIOM (organizadora); MITECO; Junta CyL; Valladolid (ciudad en Misión Climática EU); participación habitual de ministerios y comunidades autónomas</td>
+</tr>
+
+      <!-- FIRHABITAT 2026 -->
+      <tr data-date="2026-06-05" data-pais="ES" data-anio="2026" data-tipo="Madera" data-rel="3">
+<td class="nombre">FIRHÀBITAT 2026 (V ed. — Feria Bioconstrucción y Eficiencia Energética)</td><td>Primer fin de semana jun 2026 (fecha por confirmar)</td><td>Avià, Berguedà (Barcelona)</td><td><span class="tag tag-pais-es">ES</span></td><td><span class="tag tag-tipo-m">Madera</span></td><td class="num">~5.000 (1ª ed.; creciente)</td><td class="num">~50 expositores</td><td class="num">Ponencias técnicas · talleres bioconstrucción · encuentro anual IEB (Máster Bioconstrucción) · Premios Firhàbitat</td><td><div class="relevancia r3"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></td><td class="nota">Única feria de bioconstrucción y biología del hábitat de Cataluña. Cubre madera, paja, cáñamo, bambú, eficiencia energética, autoconsumo y vivienda saludable. Sede permanente del encuentro anual del IEB (Instituto Español de Baubiologie) y su Máster de Bioconstrucción, referente nacional. Formato ciclo anual sept-junio + gran feria en junio. Público mixto: profesionales y ciudadanía. Bienal a partir de 2026 (alterna con feria forestal nueva). Relevante para Cesefor en la intersección madera-bioconstrucción-salud.</td><td style="white-space:nowrap;"><a href="https://firhàbitat.cat" target="_blank" style="color:var(--accent3);text-decoration:none;font-size:11px;">🔗 web</a></td><td><span class="pub-pill pub-media"></span>Media — ACEB (Associació Comarcal Empresaris Berguedà); Ayto. Avià; ICAEN (Institut Català Energia); Agència Desenvolupament Berguedà; Consell Comarcal Berguedà; UPC School</td>
+</tr>
+
+      <!-- CLUB MADERA NETWORKING / ECOHUB 2026 -->
+      <tr data-date="2026-04-15" data-pais="ES" data-anio="2026" data-tipo="Madera" data-rel="5">
+<td class="nombre">Club Madera Networking — EcoHUB Barcelona 2026</td><td>15–16 abr 2026</td><td>Barcelona (EcoHUB, Cabrera de Mar / COAC)</td><td><span class="tag tag-pais-es">ES</span></td><td><span class="tag tag-tipo-m">Madera</span></td><td class="num">N/D (evento sectorial cerrado; >30 empresas participantes)</td><td class="num">30+ empresas (fabricantes CLT, constructoras, promotoras)</td><td class="num">Jornada técnica COAC (día 15) · Speed Networking one-to-one 15 min. (día 16) · presentación proyectos referentes</td><td><div class="relevancia r5"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></td><td class="nota">Evento propio del Club Madera (Cesefor) en formato networking estructurado one-to-one, único en España. Permite a cada asistente planificar agenda de reuniones con empresas referentes en un solo día. Ed. 2026: presentación de BlueTechPort (Puerto de Barcelona), Centro Medicina de Precisión Sant Joan de Déu (madera CLT, Batlleiroig) y coliving Tomás Bretón (CLT, Xilonor-Finsa). Andrew Waugh (Waugh Thistleton Architects) como ponente estelar. EcoHUB es el espacio de bioconstrucción en Cabrera de Mar que actúa como sede y comunidad de referencia. Máxima relevancia para Cesefor: evento propio.</td><td style="white-space:nowrap;"><a href="https://www.clubmaderanetworking.com" target="_blank" style="color:var(--accent3);text-decoration:none;font-size:11px;">🔗 web</a></td><td><span class="pub-pill pub-media"></span>Media — Club Madera (Cesefor); EcoHUB (C. Innovación Bioconstrucción); AUS/COAC (Agrupación Arquitectura y Sostenibilidad); FIMMA+Maderalia</td>
+</tr>
+
+      <!-- MCS ASTURIAS 2026 -->
+      <tr data-date="2026-12-01" data-pais="ES" data-anio="2026" data-tipo="Madera" data-rel="3">
+<td class="nombre">Forum MCS Asturias (VII ed. — Madera y Construcción Sostenible)</td><td>Dic 2026 (prev. 1ª quincena; ed. 2025: 11 dic)</td><td>Avilés, Asturias (Hotel Palacio de Avilés)</td><td><span class="tag tag-pais-es">ES</span></td><td><span class="tag tag-tipo-m">Madera</span></td><td class="num">N/D (foro profesional reducido)</td><td class="num">N/D</td><td class="num">Conferencias técnicas · mesa redonda colegios profesionales · presentación revista Working Building</td><td><div class="relevancia r3"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></td><td class="nota">Único foro monográfico de Asturias dedicado a madera y construcción sostenible. Anual desde 2019, formato congreso de un día con ponentes técnicos nacionales e internacionales. Foco en ejemplos prácticos, detalles constructivos, rehabilitación y prescripción. Organizado por GBCE con los colegios profesionales asturianos. Conecta con el ecosistema técnico de Asturias (región con fuerte base forestal). Relevante para Cesefor como prescripción técnica ante colegios profesionales de CAN.</td><td style="white-space:nowrap;"><a href="https://www.afyepa.com/MCS.html" target="_blank" style="color:var(--accent3);text-decoration:none;font-size:11px;">🔗 web</a></td><td><span class="pub-pill pub-alta"></span>Alta — AFyEPA (Asoc. Franquicias y Emprendedores Principado Asturias); Ayto. Avilés; Colegio Aparejadores Asturias; Colegio Ingenieros Industriales Asturias; GBCE (Green Building Council España); Cogersa</td>
+</tr>
+
+      <!-- ECOCONSTRUIR / ECOHUB 2026 -->
+      <tr data-date="2026-04-15" data-pais="ES" data-anio="2026" data-tipo="Madera" data-rel="3">
+<td class="nombre">EcoConstruir 2026 (III ed. — organizado por EcoHUB)</td><td>May-Jun 2026 (prev.; ed. 2024: 31 may–1 jun)</td><td>Cabrera de Mar, Barcelona (EcoHUB)</td><td><span class="tag tag-pais-es">ES</span></td><td><span class="tag tag-tipo-m">Madera</span></td><td class="num">1.500+ (ed. 2024)</td><td class="num">85 (ed. 2024)</td><td class="num">~60 ponentes · EcoConstruir Agora (debates) · talleres · zona networking</td><td><div class="relevancia r3"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></td><td class="nota">Feria boutique de bioconstrucción en el espacio EcoHUB (Cabrera de Mar, Maresme). Materiales naturales (madera, paja, micelio, barro, cal), industrialización sostenible, arquitectura saludable, fachadas verdes, gestión del agua. Formato mixto: zona expo + agora de debates + talleres. Fuerte conexión con la comunidad profesional de arquitectura sostenible catalana. Mismo espacio que alberga el Club Madera Networking. El ecosistema EcoHUB actúa como hub permanente (showroom, co-working, eventos) entre ferias.</td><td style="white-space:nowrap;"><a href="https://ecoconstruir.com" target="_blank" style="color:var(--accent3);text-decoration:none;font-size:11px;">🔗 web</a></td><td><span class="pub-pill pub-baja"></span>Baja-Media — EcoHUB (organiza); empresas e instituciones del ecosistema bioconstrucción catalán</td>
+</tr>
+
+      <!-- FECS VIC 2026 -->
+      <tr data-date="2026-02-01" data-pais="ES" data-anio="2026" data-tipo="Madera" data-rel="3">
+<td class="nombre">FECS 2026 — Fira de l'Energia i la Construcció Sostenible (IV ed.)</td><td>Feb 2026 (bienal; fecha exacta no confirmada)</td><td>Vic, Barcelona (Recinte Firal El Sucre)</td><td><span class="tag tag-pais-es">ES</span></td><td><span class="tag tag-tipo-m">Madera</span></td><td class="num">N/D (evento local-regional; público profesional y general)</td><td class="num">N/D</td><td class="num">Conferencias · demos · concurso construcción rápida con materiales naturales · encuentro artesanos-bioconstructores</td><td><div class="relevancia r3"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></td><td class="nota">Fusión de ferias de biomasa, biogás y bioconstrucción de Vic. Bienal a partir de 2024 (alterna con feria forestal nueva). Sectores: madera constructiva, casas pasivas, biomasa, biogás, autoconsumo, comunidades energéticas, rehabilitación sostenible. Organizada por el Ayto. de Vic con apoyo del ICAEN, CTFC e Incafust, lo que le da una base técnico-institucional sólida. Relevante para Cesefor por la conexión con el ecosistema técnico catalán de madera y energía (CTFC, Incafust).</td><td style="white-space:nowrap;"><a href="https://www.facebook.com/FECSVic" target="_blank" style="color:var(--accent3);text-decoration:none;font-size:11px;">🔗 web</a></td><td><span class="pub-pill pub-alta"></span>Alta — Ayto. Vic (organizador); Generalitat de Catalunya; ICAEN; Centro Tecnológico Forestal Catalunya (CTFC); Diputació Barcelona; UAB; Clúster Bionenergía Catalunya; Clúster Energía Eficiente Catalunya; COAC; CAATEEB; Gremi de la Fusta; Incafust</td>
+</tr>
+
+      <!-- BIOCULTURA BARCELONA 2026 -->
+      <tr data-date="2026-05-07" data-pais="ES" data-anio="2026" data-tipo="Madera" data-rel="2">
+<td class="nombre">BIOCULTURA Barcelona 2026 (32ª ed.)</td><td>7–10 may 2026</td><td>Barcelona (La Farga, L'Hospitalet)</td><td><span class="tag tag-pais-es">ES</span></td><td><span class="tag tag-tipo-m">Madera</span></td><td class="num">~40.000 (estimado)</td><td class="num">~300 expositores</td><td class="num">300+ actividades paralelas; sector Casa Sana incluye bioconstrucción</td><td><div class="relevancia r2"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></td><td class="nota">Mayor feria de consumo ecológico y responsable de España. 32ª edición. Incluye sector "Casa Sana" y "Bioconstrucción y Energías Renovables" dentro de un programa amplio de alimentación, cosmética y moda. No es específica de construcción con madera: la bioconstrucción es un subsector. Útil para visibilidad pública y contacto con consumidores comprometidos y comunidades de autoedificación. También se celebra en Madrid (oct-nov). Baja relevancia técnica para Cesefor, pero interesante para comunicación a ciudadanía.</td><td style="white-space:nowrap;"><a href="https://www.biocultura.org" target="_blank" style="color:var(--accent3);text-decoration:none;font-size:11px;">🔗 web</a></td><td><span class="pub-pill pub-baja"></span>Baja — Asociación Vida Sana (organiza); enfoque ONG y ciudadanía; sector bioconstrucción como uno más entre alimentación eco, cosmética, moda</td>
+</tr>
+
+      <!-- NEB INFODAY MADRID 2026 -->
+      <tr data-date="2026-05-12" data-pais="ES" data-anio="2026" data-tipo="Sostenibilidad" data-rel="5">
+<td class="nombre">NEB Infoday Nacional & Encuentros B2B — New European Bauhaus</td><td>12 may 2026 (9:30–17:00)</td><td>Madrid (ETSAM — UPM, Pabellón Antiguo)</td><td><span class="tag tag-pais-es">ES</span></td><td><span class="tag tag-tipo-s">Sostenibilidad</span></td><td class="num">N/D (evento profesional cerrado; inscripción gratuita)</td><td class="num">N/D (máx. 8 pitches; mesas redondas; B2B)</td><td class="num">Sesiones informativas NEB Facility 2026 · Pitching Session · Mesa Redonda ecosistema NEB España · Encuentros B2B concertados · NCP CDTI + FECYT</td><td><div class="relevancia r5"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></td><td class="nota">Primer evento nacional de formación de consorcios para las convocatorias NEB Facility 2026-2027 (9 convocatorias abiertas desde el 5 mayo, deadline 1 diciembre). Organizado por los NCPs oficiales de España para la NEB. Incluye: sesiones sobre los 3 destinos NEB (participación ciudadana, regeneración entorno construido, innovación financiera); pitching session de proyectos; encuentros B2B para formación de consorcios Horizon. Cesefor ya trabaja en la órbita NEB (proyecto URBANEW) y tiene acceso a las convocatorias NEB R&I. Asistir al Infoday es el paso clave para identificar socios de consorcio y presentarse como entidad tecnológica de referencia en biomateriales y construcción industrializada.</td><td style="white-space:nowrap;"><a href="https://neweuropeanbauhaus.es/agenda/neb-en-espana-infoday-y-reuniones-b2b/" target="_blank" style="color:var(--accent3);text-decoration:none;font-size:11px;">🔗 web</a></td><td><span class="pub-pill pub-alta"></span>Máxima — Organizado por Sec. Gral. Agenda Urbana y Arquitectura (Min. Vivienda y Agenda Urbana) como NCP-NEB Policy + CDTI + FECYT (Min. Ciencia); Enterprise Europe Network (EEN) Madrid; primer Brokerage Event nacional NEB</td>
+</tr>
+
+      <!-- TECMA 2026 -->
+      <tr data-date="2026-06-09" data-pais="ES" data-anio="2026" data-tipo="Sostenibilidad" data-rel="4">
+        <td class="nombre">TECMA 2026 (22ª ed.) + SRR + Foro de las Ciudades de Madrid</td>
+        <td>9–11 jun 2026</td>
+        <td>Madrid (IFEMA, Pabellón 9)</td>
+        <td><span class="tag tag-pais-es">ES</span></td>
+        <td><span class="tag tag-tipo-s">Sostenibilidad</span></td>
+        <td class="num">>15.000 (récord ed. 2024; 48 países)</td>
+        <td class="num">~120 (+28 nuevos; +20% superficie vs 2024)</td>
+        <td class="num">Foro de las Ciudades (50+ ciudades, 20 internacionales) · XXII Congreso FER · Premio Árbol · Concurso Escobas Plata-Oro-Platino · 500+ profesionales en SRR</td>
+        <td><div class="relevancia r4"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></td>
+        <td class="nota">Mayor evento comercial de urbanismo, medio ambiente y economía circular del sur de Europa. Sectores: gestión de residuos, limpieza viaria, espacio público, servicios urbanos inteligentes, adaptación climática, eficiencia energética, naturaleza urbana. El Foro de las Ciudades es el eje de contenidos: congreso con alcaldes, directores de servicios urbanos y técnicos municipales de 50+ ciudades. Coincide con SRR (reciclado), Global Mobility Call y SocioCare. Alianza por la Innovación Urbana (Ayto. Madrid + RECI + CSCAE). Laboratorio sobre Naturaleza Urbana (25 feb, precuela online). Patrocinadores: FCC, PreZero, Ecoembes, INECO, CREA Madrid Nuevo Norte. Relevante para Cesefor en el eje biomateriales en espacio urbano y naturaleza urbana, y contacto con técnicos municipales decisores.</td>
+        <td class="nota" style="white-space:nowrap"><a href="https://www.ifema.es/tecma" target="_blank" style="color:var(--accent3);text-decoration:none;font-size:11px">🔗 enlace</a></td>
+        <td><span class="pub-pill pub-alta"></span>Máxima — IFEMA (organiza); Ayto. Madrid; FEMP; RECI; CSCAE; Alianza por la Innovación Urbana; Ategrus, Anepma, Afamour, Aselip (asociaciones sectoriales)</td>
+      </tr>
+
+    </tbody>
+  </table>
+  <div class="no-results" id="noResults">No se encontraron eventos con los filtros seleccionados.</div>
+</div>
+
+<div class="legend">
+  <div class="legend-group">
+    <span class="legend-title">País:</span>
+    <span class="tag tag-pais-es">ES España</span>
+    <span class="tag tag-pais-pt">PT Portugal</span>
+    <span class="tag tag-pais-eu">EU Europa</span>
+  </div>
+  <div class="legend-group">
+    <span class="legend-title">Tipo:</span>
+    <span class="tag tag-tipo-c">Construcción</span>
+    <span class="tag tag-tipo-s">Sostenibilidad/Ciudad</span>
+    <span class="tag tag-tipo-e">Energía/Descarbonización</span>
+    <span class="tag tag-tipo-u">Urbanismo/Smart City</span>
+    <span class="tag tag-tipo-m">Madera (cadena de valor)</span>
+  </div>
+  <div class="legend-group">
+    <span class="legend-title">Presencia pública:</span>
+    <span><span class="pub-pill pub-alta"></span>Alta/Máxima</span>
+    <span><span class="pub-pill pub-media"></span>Media</span>
+    <span><span class="pub-pill pub-baja"></span>Baja</span>
+  </div>
+  <div class="legend-group">
+    <span class="legend-title">Relevancia para Cesefor:</span>
+    <div class="relevancia r5" style="display:inline-flex"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div> Muy alta &nbsp;
+    <div class="relevancia r3" style="display:inline-flex"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div> Media &nbsp;
+    <div class="relevancia r2" style="display:inline-flex"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div> Baja
+  </div>
+</div>
+
+<script>
+  function updateCount() {
+    const rows = document.querySelectorAll('#tbody tr');
+    const visible = [...rows].filter(r => !r.classList.contains('hidden')).length;
+    document.getElementById('visible').textContent = visible;
+    document.getElementById('total').textContent = rows.length;
+    document.getElementById('noResults').style.display = visible === 0 ? 'block' : 'none';
+  }
+
+  function applyFilters() {
+    const search = document.getElementById('search').value.toLowerCase();
+    const pais = document.getElementById('filterPais').value;
+    const anio = document.getElementById('filterAnio').value;
+    const tipo = document.getElementById('filterTipo').value;
+
+    document.querySelectorAll('#tbody tr').forEach(row => {
+      const text = row.textContent.toLowerCase();
+      const matchSearch = !search || text.includes(search);
+      const matchPais = !pais || row.dataset.pais === pais;
+      const matchAnio = !anio || row.dataset.anio === anio;
+      const matchTipo = !tipo || row.dataset.tipo === tipo;
+      row.classList.toggle('hidden', !(matchSearch && matchPais && matchAnio && matchTipo));
+    });
+    updateCount();
+  }
+
+  function resetFilters() {
+    document.getElementById('search').value = '';
+    document.getElementById('filterPais').value = '';
+    document.getElementById('filterAnio').value = '';
+    document.getElementById('filterTipo').value = '';
+    applyFilters();
+  }
+
+  document.getElementById('search').addEventListener('input', applyFilters);
+  document.getElementById('filterPais').addEventListener('change', applyFilters);
+  document.getElementById('filterAnio').addEventListener('change', applyFilters);
+  document.getElementById('filterTipo').addEventListener('change', applyFilters);
+
+  // Numeric columns: Visitantes(5), Expositores(6)
+  const NUM_COLS = new Set([5, 6]);
+
+  // Parse a possibly-Spanish-formatted number from messy cell text.
+  // Returns -1 for unknowns (N/D, text-only) so they sort to the bottom.
+  function extractNum(text) {
+    const t = text.trim();
+    // Treat N/D (and variants) as unknown regardless of extra text in parentheses
+    if (/^N\/D/i.test(t) || t === '' || t === '—') return -1;
+    // Also treat "Miles", "Proyectos", purely textual values as unknown
+    if (/^[A-Za-záéíóúñÁÉÍÓÚÑ]/.test(t) && !/\d/.test(t)) return -1;
+    // Remove Spanish thousands separator: dot followed by exactly 3 digits
+    // e.g. 32.500 → 32500, but keep 1.5 as-is (won't appear here)
+    let clean = t.replace(/\.(\d{3})/g, '$1');
+    // Strip non-numeric prefix chars: ~, >, <, +, spaces
+    clean = clean.replace(/[~><!+ ]/g, '');
+    // Grab first integer (handles ranges like 25000–27000 → 25000)
+    const m = clean.match(/\d+/);
+    return m ? parseInt(m[0], 10) : -1;
+  }
+
+  let sortDir = {};
+  function sortTable(colIndex) {
+    const tbody = document.getElementById('tbody');
+    const rows = [...tbody.querySelectorAll('tr')];
+    const dir = sortDir[colIndex] === 'asc' ? 'desc' : 'asc';
+    sortDir = {};
+    sortDir[colIndex] = dir;
+
+    rows.sort((a, b) => {
+      // Date column
+      if (colIndex === 1) {
+        const aV = a.dataset.date || '9999-12-31';
+        const bV = b.dataset.date || '9999-12-31';
+        return dir === 'asc' ? aV.localeCompare(bV) : bV.localeCompare(aV);
+      }
+      // Relevancia column (index 8) — use data-rel attribute
+      if (colIndex === 8) {
+        const aV = parseInt(a.dataset.rel || '0', 10);
+        const bV = parseInt(b.dataset.rel || '0', 10);
+        return dir === 'asc' ? aV - bV : bV - aV;
+      }
+      // Numeric columns: Visitantes(5), Expositores(6)
+      if (NUM_COLS.has(colIndex)) {
+        const aText = a.cells[colIndex]?.textContent.trim() || '';
+        const bText = b.cells[colIndex]?.textContent.trim() || '';
+        const aN = extractNum(aText);
+        const bN = extractNum(bText);
+        // Unknown/N/D goes to bottom regardless of direction
+        if (aN < 0 && bN < 0) return 0;
+        if (aN < 0) return 1;
+        if (bN < 0) return -1;
+        return dir === 'asc' ? aN - bN : bN - aN;
+      }
+      // Default: alphabetical
+      const aText = a.cells[colIndex]?.textContent.trim() || '';
+      const bText = b.cells[colIndex]?.textContent.trim() || '';
+      return dir === 'asc' ? aText.localeCompare(bText, 'es') : bText.localeCompare(aText, 'es');
+    });
+
+    rows.forEach(r => tbody.appendChild(r));
+
+    document.querySelectorAll('thead th').forEach((th, i) => {
+      th.classList.toggle('sorted', i === colIndex);
+      const ind = th.querySelector('.sort-indicator');
+      if (ind) ind.textContent = i === colIndex ? (dir === 'asc' ? '↑' : '↓') : '↕';
+    });
+    updateCount();
+  }
+
+  updateCount();
+</script>
+</body>
+</html>
